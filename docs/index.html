@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONT CRISPR Amplicon Sequencing — NSP Project</title>
+  <style>
+    :root {
+      --primary: #1a557a;
+      --accent: #2c7a4b;
+      --light: #e8f4f8;
+      --orange: #e66101;
+      --bg: #fafbfc;
+      --card-bg: #ffffff;
+      --text: #24292e;
+      --muted: #586069;
+      --border: #e1e4e8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, var(--primary), #2d6e9e);
+      color: white;
+      padding: 60px 20px 50px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2.2em; margin-bottom: 10px; font-weight: 700; }
+    .hero p { font-size: 1.15em; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+    .hero .tags { margin-top: 18px; }
+    .hero .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin: 4px;
+      font-size: 0.85em;
+    }
+
+    /* Container */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+    /* Section */
+    section { padding: 40px 0; }
+    section + section { border-top: 1px solid var(--border); }
+    h2 {
+      color: var(--primary);
+      font-size: 1.5em;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--light);
+    }
+    h3 { color: var(--accent); margin: 20px 0 8px; font-size: 1.15em; }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card h4 { color: var(--primary); margin-bottom: 6px; }
+    .card .num { font-size: 2em; font-weight: 700; color: var(--accent); }
+    .card .label { color: var(--muted); font-size: 0.9em; }
+
+    /* Workflow */
+    .workflow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .wf-step {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 160px;
+      max-width: 200px;
+    }
+    .wf-step .step-num {
+      background: var(--primary);
+      color: white;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .wf-step h5 { font-size: 0.95em; color: var(--primary); margin-bottom: 4px; }
+    .wf-step p { font-size: 0.8em; color: var(--muted); }
+    .wf-arrow {
+      font-size: 1.5em;
+      color: var(--primary);
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th {
+      background: var(--primary);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.9em;
+    }
+    td { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.9em; }
+    tr:nth-child(even) { background: #f6f8fa; }
+    tr.done td:first-child::before { content: "✓ "; color: var(--accent); font-weight: bold; }
+    tr.pending td:first-child::before { content: "○ "; color: var(--muted); }
+
+    /* Code */
+    pre {
+      background: #24292e;
+      color: #e1e4e8;
+      border-radius: 6px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+    pre code { background: none; padding: 0; }
+
+    /* Reference diagram */
+    .ref-diagram {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82em;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .ref-diagram .genomic { color: var(--primary); }
+    .ref-diagram .exon { color: var(--accent); font-weight: bold; }
+    .ref-diagram .primer { color: #6f42c1; }
+    .ref-diagram .sgrna { color: var(--orange); font-weight: bold; }
+
+    /* Status badge */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .badge-done { background: #dcffe4; color: #22863a; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--muted);
+      font-size: 0.85em;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>ONT CRISPR Amplicon Sequencing</h1>
+  <p>Nanopore sequencing of CRISPR-Cas9 edited <em>Pieris brassicae</em> NSP gene — 24 barcoded amplicon libraries on MinION</p>
+  <div class="tags">
+    <span class="tag">Oxford Nanopore</span>
+    <span class="tag">CRISPR-Cas9</span>
+    <span class="tag">Amplicon-seq</span>
+    <span class="tag">Pieris brassicae</span>
+    <span class="tag">NSP gene</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Overview -->
+<section>
+  <h2>Project Overview</h2>
+  <p>
+    This project assesses CRISPR-Cas9 editing efficiency at the <strong>Nitrile Specifier Protein (NSP)</strong>
+    gene in <em>Pieris brassicae</em>. A ~500 bp PCR amplicon spanning the sgRNA target site was
+    sequenced on an Oxford Nanopore MinION (R10.4.1 flow cell). 24 barcoded samples were multiplexed
+    in a single run. Reads are aligned to the genomic reference to characterize indel patterns at the
+    CRISPR cut site.
+  </p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="num">24</div>
+      <div class="label">Barcoded samples</div>
+    </div>
+    <div class="card">
+      <div class="num">~150K+</div>
+      <div class="label">Total reads across barcodes</div>
+    </div>
+    <div class="card">
+      <div class="num">699 bp</div>
+      <div class="label">Reference region length</div>
+    </div>
+    <div class="card">
+      <div class="num">~500 bp</div>
+      <div class="label">Amplicon size</div>
+    </div>
+  </div>
+</section>
+
+<!-- Reference -->
+<section>
+  <h2>Reference Region</h2>
+  <p>
+    The reference is a 699 bp region from <em>P. brassicae</em> chromosome 5
+    (<code>NC_059669.1:14882048-14885601</code>) containing the first coding exon of the NSP gene,
+    flanked by intronic/intergenic sequence.
+  </p>
+
+  <div class="ref-diagram"><span class="genomic">5'─────────────────────────────────────────────────────────────────────────3'</span>
+<span class="genomic">   │                  │                                              │    │</span>
+<span class="primer">   │  Fwd primer ──►  │</span>                                              <span class="primer">│  ◄── Rev primer</span>
+<span class="genomic">   │                  │</span>  <span class="exon">╔══════════ Exon 1 (276 bp) ══════════╗</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>  <span class="exon">║  ATG...                         ...║</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>  <span class="exon">╚═════════════════════════════════════╝</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>      <span class="sgrna">▼▼▼ sgRNA_2 cut site ▼▼▼</span>             <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>      <span class="sgrna">CTTCTTAGCCCTCGCGGCTTTGG</span>             <span class="genomic">│    │</span>
+<span class="genomic">   0                ~60               ~230                        ~600  699</span></div>
+
+  <h3>Reference files</h3>
+  <table>
+    <tr><th>File</th><th>Description</th></tr>
+    <tr><td><code>NSP_region_PCR_sgRNA_genomicDNA.fasta</code></td><td>Multi-entry fasta: genomic DNA, exon, primers, sgRNA (with gap-alignment)</td></tr>
+    <tr><td><code>NSP_genomic_ref.fasta</code></td><td>Clean genomic reference (699 bp, gaps removed) — used for alignment</td></tr>
+    <tr><td><code>NSP_genomic_ref.mmi</code></td><td>Minimap2 index</td></tr>
+  </table>
+</section>
+
+<!-- Workflow -->
+<section>
+  <h2>Analysis Workflow</h2>
+
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="step-num">1</div>
+      <h5>MinION Sequencing</h5>
+      <p>R10.4.1 flow cell, HAC basecalling, demultiplexed to 24 barcodes</p>
+    </div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">
+      <div class="step-num">2</div>
+      <h5>QC (FastQC)</h5>
+      <p>Per-barcode quality assessment of raw reads</p>
+    </div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">
+      <div class="step-num">3</div>
+      <h5>Align (minimap2)</h5>
+      <p>Map ONT reads to 699 bp genomic reference</p>
+    </div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">
+      <div class="step-num">4</div>
+      <h5>BAM + Index</h5>
+      <p>Sort &amp; index with samtools for IGV viewing</p>
+    </div>
+    <div class="wf-arrow">→</div>
+    <div class="wf-step">
+      <div class="step-num">5</div>
+      <h5>Indel Analysis</h5>
+      <p>Characterize CRISPR edits at sgRNA cut site</p>
+    </div>
+  </div>
+
+  <h3>Commands</h3>
+  <pre><code># Align a barcode to reference (ONT preset, output sorted BAM)
+minimap2 -a -x map-ont --MD NSP_genomic_ref.mmi barcode01/*.fastq.gz | \
+  samtools sort -o barcode01_aligned.bam -
+samtools index barcode01_aligned.bam
+
+# FastQC
+fastqc barcode01/*.fastq.gz -o . --threads 2</code></pre>
+</section>
+
+<!-- Progress -->
+<section>
+  <h2>Barcode Status</h2>
+
+  <table>
+    <tr><th>Barcode</th><th>Reads</th><th>Aligned</th><th>FastQC</th></tr>
+    <tr class="done"><td>barcode01</td><td>15,119</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-done">Done</span></td></tr>
+    <tr class="done"><td>barcode02</td><td>12,126</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode03</td><td>11,008</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode04</td><td>8,910</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode05</td><td>6,940</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode06</td><td>10,323</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode07</td><td>17,108</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode08</td><td>13,009</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode09</td><td>27,921</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode10</td><td>5,685</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="done"><td>barcode11</td><td>21,097</td><td><span class="badge badge-done">Done</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode12</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode13</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode14</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode15</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode16</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode17</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode18</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode19</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode20</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode21</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode22</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode23</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+    <tr class="pending"><td>barcode24</td><td>—</td><td><span class="badge badge-pending">Pending</span></td><td><span class="badge badge-pending">Pending</span></td></tr>
+  </table>
+</section>
+
+<!-- Sequencing details -->
+<section>
+  <h2>Sequencing Details</h2>
+  <table>
+    <tr><th>Parameter</th><th>Value</th></tr>
+    <tr><td>Platform</td><td>Oxford Nanopore MinION</td></tr>
+    <tr><td>Flow cell</td><td>R10.4.1 (FBF81064)</td></tr>
+    <tr><td>Basecaller</td><td>dna_r10.4.1_e8.2_400bps_hac v5.2.0</td></tr>
+    <tr><td>Run date</td><td>2026-03-05</td></tr>
+    <tr><td>Protocol</td><td>NSP_500bp_trial</td></tr>
+    <tr><td>Sample</td><td>NSP_Pnapi_500bp</td></tr>
+    <tr><td>Barcoding</td><td>24 barcodes + unclassified</td></tr>
+    <tr><td>Target organism</td><td><em>Pieris brassicae</em> (Large White butterfly)</td></tr>
+    <tr><td>Gene</td><td>NSP — Nitrile Specifier Protein (LOC123709534)</td></tr>
+    <tr><td>Reference</td><td>NC_059669.1:14882048-14885601 (chromosome 5)</td></tr>
+  </table>
+</section>
+
+<!-- Tools -->
+<section>
+  <h2>Software</h2>
+  <table>
+    <tr><th>Tool</th><th>Version</th><th>Purpose</th></tr>
+    <tr><td>minimap2</td><td>2.30</td><td>ONT read alignment (<code>-x map-ont</code>)</td></tr>
+    <tr><td>samtools</td><td>1.23</td><td>BAM sorting, indexing, stats</td></tr>
+    <tr><td>FastQC</td><td>0.12.1</td><td>Read quality assessment</td></tr>
+    <tr><td>IGV</td><td>—</td><td>Visual inspection of alignments</td></tr>
+  </table>
+</section>
+
+</div>
+
+<footer>
+  ONT CRISPR Amplicon Sequencing — NSP Project | bioinfowheat
+</footer>
+
+</body>
+</html>
