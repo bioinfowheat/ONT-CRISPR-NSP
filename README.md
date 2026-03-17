@@ -4,16 +4,14 @@ Nanopore sequencing of CRISPR-Cas9 edited *Pieris brassicae* NSP gene — 24 bar
 
 **[View the project page →](https://bioinfowheat.github.io/ONT-CRISPR-NSP/)**
 
-## Quick Start
+## OVERVIEW
 
-```bash
-# Install tools
-brew install minimap2 samtools fastqc
+this project is taking ONT reads from PCR amplicon sequencing
 
-# Align a barcode
-minimap2 -a -x map-ont --MD NSP_genomic_ref.mmi barcode01/*.fastq.gz | \
-  samtools sort -o barcode01_aligned.bam -
-samtools index barcode01_aligned.bam
-```
+- **Assess raw read quality:**
+- **Trim reads:**
+- **Assess cleaned read quality:**
+- **Map reads:**
+- **Download and assess in IGV:**
 
-See the [project page](https://bioinfowheat.github.io/ONT-CRISPR-NSP/) for full details.
+See the [project page](https://bioinfowheat.github.io/ONT-CRISPR-NSP/) for overview details.

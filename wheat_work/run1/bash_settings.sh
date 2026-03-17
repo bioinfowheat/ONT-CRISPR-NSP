@@ -1,14 +1,19 @@
 
-# working paths for all commands in tutorial
-export PATH=$PATH:/data/programs/FastQC:/data/programs/samtools-1.9:/data/programs/cutadapt-1.8.3/bin:/data/programs/fastsimcoal26:/data/programs/plink1.9:/data/programs/bwa-mem2-2.2.1_x64-linux:/data/programs/gatk-4.6.2.0:/data/programs/admixture_linux-1.3.0
-export JAVA_HOME=/opt/jdk17
-export PATH=$JAVA_HOME/bin:$PATH
+# users
+grenik
+matmiq
+nogmoh
+elenik
+elegom
 
+# paths for installed software they can use 
+# may need to change my :general settings
 
+# can I also modify their bash so when the login they go directly to /mnt/griffin/user?
 
-
-for user in marcha soferr elegom ellkon faiony anirou nikwer ulljoh marric aglsko samwal larlit maffer tester vikove sofnyb ;do
-    sudo echo 'export PATH=$PATH:/data/programs/FastQC:/data/programs/samtools-1.9:/data/programs/cutadapt-1.8.3/bin:/data/programs/fastsimcoal26:/data/programs/plink1.9:/data/programs/bwa-mem2-2.2.1_x64-linux:/data/programs/gatk-4.6.2.0:/data/programs/admixture_linux-1.3.0' >> /home/$user/.bashrc
+ 
+for user in elegom grenik matmiq nogmoh elenik ;do
+    sudo echo 'export PATH=$PATH:/mnt/griffin/chrwhe/software/FastQC:/mnt/griffin/chrwhe/software/samtools-1.10:/mnt/griffin/chrwhe/software/minimap2' >> /home/$user/.bashrc
     sudo echo 'export JAVA_HOME=/opt/jdk17' >> /home/$user/.bashrc
     sudo echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /home/$user/.bashrc
 done
