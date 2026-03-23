@@ -92,38 +92,51 @@ zcat ./barcode09/FBF81064_pass_barcode09_b0e09933_66cabb9a_1.fastq.gz | tail -n 
 # and save as simplified name
 
 # test
-for x in {1..2}; do
+for x in {01..02}; do
     find . -name "*barcode$x*.fastq.gz" | grep 'pass' | grep 'barcode' 
     echo $x
 done
+# ./barcode01/FBF81064_pass_barcode01_b0e09933_66cabb9a_0.fastq.gz
+# ./barcode01/FBF81064_pass_barcode01_b0e09933_66cabb9a_1.fastq.gz
+# 01
+# ./barcode02/FBF81064_pass_barcode02_b0e09933_66cabb9a_0.fastq.gz
+# ./barcode02/FBF81064_pass_barcode02_b0e09933_66cabb9a_1.fastq.gz
+# 02
 
-# combine for set of 24 barcodes
-for x in {1..24}; do
-    find . -name "*barcode$x*.fastq.gz" | grep 'pass' | grep 'barcode' | xargs cat > "barcode${x}.combined.fastq.gz"
+# test this to spit out 01 to 24, which it does!!!
+for x in {01..24}; do
+    echo $x
 done
 
 
-# find . -name "*_0.fastq.gz" | grep barcode | cut -f2 -d '/' | grep -oP 'barcode\d+'
+# combine for set of 24 barcodes
+mkdir combined_fastq_files
+for x in {01..24}; do
+    find . -name "*barcode$x*.fastq.gz" | grep 'pass' | grep 'barcode' | xargs cat > combined_fastq_files/"barcode${x}.combined.fastq.gz"
+done
+
+find . -name "*barcode24*.fastq.gz" | grep 'pass' | grep 'barcode' | tail 
 
 
-# find . -name "*_0.fastq.gz" | grep barcode| while read f; do
-#     cp "$f" fastq_files/$(echo "$f" | cut -f2 -d '/' | grep -oP 'barcode\d+').run1.fastq.gz
-# done
+# assess, looks like it got things right!
+zcat combined_fastq_files/barcode09.combined.fastq.gz | tail -n 4 | head -1
+@7448a1f2-49b8-4dda-983d-57d851f3d9d5 runid=b0e09933-dbfa-44e0-900c-21cc9e7e4d18 ch=68 start_time=2026-03-05T17:16:24.520170+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_500bp_trial sample_id=NSP_Pnapi_500bp barcode=barcode09 barcode_alias=barcode09 parent_read_id=7448a1f2-49b8-4dda-983d-57d851f3d9d5 basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+
 
 # now I have a folder of only the fastq files
-ls fastq_files/
-# barcode01.run1.fastq.gz  barcode05.run1.fastq.gz  barcode09.run1.fastq.gz  barcode13.run1.fastq.gz  barcode17.run1.fastq.gz  barcode21.run1.fastq.gz
-# barcode02.run1.fastq.gz  barcode06.run1.fastq.gz  barcode10.run1.fastq.gz  barcode14.run1.fastq.gz  barcode18.run1.fastq.gz  barcode22.run1.fastq.gz
-# barcode03.run1.fastq.gz  barcode07.run1.fastq.gz  barcode11.run1.fastq.gz  barcode15.run1.fastq.gz  barcode19.run1.fastq.gz  barcode23.run1.fastq.gz
-# barcode04.run1.fastq.gz  barcode08.run1.fastq.gz  barcode12.run1.fastq.gz  barcode16.run1.fastq.gz  barcode20.run1.fastq.gz  barcode24.run1.fastq.gz
+ls /mnt/griffin/chrwhe/ONTdata/run1_fastq_pass/combined_fastq_files/
+# barcode01.combined.fastq.gz  barcode06.combined.fastq.gz  barcode11.combined.fastq.gz  barcode16.combined.fastq.gz  barcode21.combined.fastq.gz
+# barcode02.combined.fastq.gz  barcode07.combined.fastq.gz  barcode12.combined.fastq.gz  barcode17.combined.fastq.gz  barcode22.combined.fastq.gz
+# barcode03.combined.fastq.gz  barcode08.combined.fastq.gz  barcode13.combined.fastq.gz  barcode18.combined.fastq.gz  barcode23.combined.fastq.gz
+# barcode04.combined.fastq.gz  barcode09.combined.fastq.gz  barcode14.combined.fastq.gz  barcode19.combined.fastq.gz  barcode24.combined.fastq.gz
+# barcode05.combined.fastq.gz  barcode10.combined.fastq.gz  barcode15.combined.fastq.gz  barcode20.combined.fastq.gz
 
-mv fastq_files/ run1_fastq_files
 
 ######
 cd /mnt/griffin/chrwhe/ONT_testing/run2_fastq_files
 
 # need to just double check what the barcodes were
-# 25-74?
+# 25-75, based upon report
 
 # can check by counting the number of files per barcode, as there should be many for ones that we used
 
@@ -156,4 +169,43 @@ sort | \
 uniq -c
 
 
+# combining this set of the 2nd run of the 1st flowcell of NSP amplicons
+mkdir combined_fastq_files
+for x in {25..75}; do
+    find . -name "*barcode$x*.fastq.gz" | grep -v "/\._" | grep 'pass' | grep 'barcode' | xargs cat > combined_fastq_files/"barcode${x}.combined.fastq.gz"
+done
+
+find . -name "*barcode75*.fastq.gz" | grep -v "/\._" | grep 'pass' | grep 'barcode'  
+
+zcat /mnt/griffin/chrwhe/ONT_testing/run2_fastq_files/combined_fastq_files/barcode75.combined.fastq.gz | tail -n 4 | head -1
+@3537691d-44c6-4177-ae56-470f7c903aed runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=412 start_time=2026-03-14T04:14:40.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=3537691d-44c6-4177-ae56-470f7c903aed basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+
+
+
+for f in *.fastq.gz; do echo "$f: $(zcat "$f" | wc -l | awk '{print $1/4}')"; done 
+...
+barcode71.combined.fastq.gz: 73087
+barcode72.combined.fastq.gz: 84843
+barcode73.combined.fastq.gz: 106010
+barcode74.combined.fastq.gz: 43066
+barcode75.combined.fastq.gz: 74159
+
+# start is the same
+find . -name "*barcode75*.fastq.gz" | grep -v "/\._" | grep 'pass' | grep 'barcode' | xargs zcat | head -1
+@c409e041-fd4a-475b-bbbf-7ad7a5f0f26d runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=313 start_time=2026-03-13T19:14:48.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=c409e041-fd4a-475b-bbbf-7ad7a5f0f26d basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+zcat combined_fastq_files/barcode75.combined.fastq.gz | head -1
+@c409e041-fd4a-475b-bbbf-7ad7a5f0f26d runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=313 start_time=2026-03-13T19:14:48.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=c409e041-fd4a-475b-bbbf-7ad7a5f0f26d basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+
+# last sequence
+find . -name "*barcode75*.fastq.gz" | grep -v "/\._" | grep 'pass' | grep 'barcode' | xargs zcat | tail -n 4 | head -1
+@2315dc36-a0cc-4947-bf1c-6d525bdecc93 runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=166 start_time=2026-03-13T19:14:42.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=2315dc36-a0cc-4947-bf1c-6d525bdecc93 basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+zcat combined_fastq_files/barcode75.combined.fastq.gz | tail -n 4 | head -1
+@2315dc36-a0cc-4947-bf1c-6d525bdecc93 runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=166 start_time=2026-03-13T19:14:42.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=2315dc36-a0cc-4947-bf1c-6d525bdecc93 basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+
+# and last file in the 
+find . -name "*barcode75*.fastq.gz" | grep -v "/\._" | grep 'pass' | grep 'barcode' | tail -1
+# /fastq_pass/barcode75/FBF81064_pass_barcode75_e7907e49_7be15ff9_2.fastq.gz
+
+zcat fastq_pass/barcode75/FBF81064_pass_barcode75_e7907e49_7be15ff9_2.fastq.gz | tail -n 4 | head -1
+@2315dc36-a0cc-4947-bf1c-6d525bdecc93 runid=e7907e49-186a-4386-85ad-35274b0c2ea6 ch=166 start_time=2026-03-13T19:14:42.712138+01:00 flow_cell_id=FBF81064 protocol_group_id=NSP_480bp_part2 sample_id= barcode=barcode75 barcode_alias=barcode75 parent_read_id=2315dc36-a0cc-4947-bf1c-6d525bdecc93 basecall_model_version_id=dna_r10.4.1_e8.2_400bps_hac@v5.2.0
 
