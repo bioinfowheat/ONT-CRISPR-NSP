@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revised Workflow — ONT CRISPR Amplicon Sequencing</title>
+  <style>
+    :root {
+      --primary: #1a557a;
+      --accent: #2c7a4b;
+      --light: #e8f4f8;
+      --orange: #e66101;
+      --bg: #fafbfc;
+      --card-bg: #ffffff;
+      --text: #24292e;
+      --muted: #586069;
+      --border: #e1e4e8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, var(--primary), #2d6e9e);
+      color: white;
+      padding: 60px 20px 50px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2.2em; margin-bottom: 10px; font-weight: 700; }
+    .hero p { font-size: 1.15em; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+    .hero .tags { margin-top: 18px; }
+    .hero .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin: 4px;
+      font-size: 0.85em;
+    }
+    .hero .nav-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.5);
+      padding: 6px 18px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      transition: background 0.2s;
+    }
+    .hero .nav-link:hover { background: rgba(255,255,255,0.15); }
+
+    /* Container */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+    /* Section */
+    section { padding: 40px 0; }
+    section + section { border-top: 1px solid var(--border); }
+    h2 {
+      color: var(--primary);
+      font-size: 1.5em;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--light);
+    }
+    h3 { color: var(--accent); margin: 20px 0 8px; font-size: 1.15em; }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card h4 { color: var(--primary); margin-bottom: 6px; }
+    .card .num { font-size: 2em; font-weight: 700; color: var(--accent); }
+    .card .label { color: var(--muted); font-size: 0.9em; }
+
+    /* Workflow */
+    .workflow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .wf-step {
+      background: var(--card-bg);
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 130px;
+      max-width: 160px;
+    }
+    .wf-step.new-step {
+      border-color: var(--orange);
+    }
+    .wf-step.new-step .step-num {
+      background: var(--orange);
+    }
+    .wf-step.new-step h5 {
+      color: var(--orange);
+    }
+    .wf-step .step-num {
+      background: var(--primary);
+      color: white;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .wf-step h5 { font-size: 0.95em; color: var(--primary); margin-bottom: 4px; }
+    .wf-step p { font-size: 0.8em; color: var(--muted); }
+    .wf-arrow {
+      font-size: 1.5em;
+      color: var(--primary);
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th {
+      background: var(--primary);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.9em;
+    }
+    td { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.9em; }
+    tr:nth-child(even) { background: #f6f8fa; }
+
+    /* Code */
+    pre {
+      background: #24292e;
+      color: #e1e4e8;
+      border-radius: 6px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+    pre code { background: none; padding: 0; }
+
+    /* Step detail blocks */
+    .step-detail {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+    .step-detail.new-detail {
+      border-left-color: var(--orange);
+    }
+    .step-detail h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step-detail h3 .step-badge {
+      background: var(--primary);
+      color: white;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8em;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-detail.new-detail h3 .step-badge {
+      background: var(--orange);
+    }
+    .step-detail p { margin: 8px 0; }
+    .step-detail ul { margin: 8px 0 8px 20px; }
+    .step-detail li { margin: 4px 0; font-size: 0.95em; }
+
+    /* Reference diagram */
+    .ref-diagram {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82em;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .ref-diagram .genomic { color: var(--primary); }
+    .ref-diagram .exon { color: var(--accent); font-weight: bold; }
+    .ref-diagram .primer { color: #6f42c1; }
+    .ref-diagram .sgrna { color: var(--orange); font-weight: bold; }
+
+    /* New-step label */
+    .new-label {
+      display: inline-block;
+      background: #fff0e0;
+      color: var(--orange);
+      font-size: 0.7em;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+      vertical-align: middle;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--muted);
+      font-size: 0.85em;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>Revised Analysis Workflow</h1>
+  <p>ONT CRISPR amplicon sequencing of <em>Pieris brassicae</em> NSP gene — updated pipeline with read trimming (fastp) and post-trim QC</p>
+  <div class="tags">
+    <span class="tag">Oxford Nanopore</span>
+    <span class="tag">CRISPR-Cas9</span>
+    <span class="tag">fastp</span>
+    <span class="tag">minimap2</span>
+    <span class="tag">IGV</span>
+  </div>
+  <a class="nav-link" href="index.html">&larr; Back to original overview</a>
+</div>
+
+<div class="container">
+
+<!-- Overview -->
+<section>
+  <h2>What changed?</h2>
+  <p>
+    The revised workflow adds a <strong>read trimming/cleaning step using fastp</strong> after initial QC,
+    followed by a second round of QC on the cleaned reads. This ensures that adapter remnants, low-quality
+    bases, and short fragments are removed before alignment, improving mapping rates and indel calling accuracy.
+  </p>
+  <div class="card-grid">
+    <div class="card">
+      <div class="num">7</div>
+      <div class="label">Pipeline steps (was 5)</div>
+    </div>
+    <div class="card">
+      <div class="num">+fastp</div>
+      <div class="label">Read cleaning &amp; trimming added</div>
+    </div>
+    <div class="card">
+      <div class="num">2&times;</div>
+      <div class="label">QC rounds (before &amp; after trimming)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Workflow diagram -->
+<section>
+  <h2>Analysis Workflow</h2>
+
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="step-num">1</div>
+      <h5>MinION Sequencing</h5>
+      <p>R10.4.1 flow cell, HAC basecalling</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step">
+      <div class="step-num">2</div>
+      <h5>Raw QC</h5>
+      <p>FastQC on raw reads</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step new-step">
+      <div class="step-num">3</div>
+      <h5>Trim (fastp)</h5>
+      <p>Adapter &amp; quality trimming</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step new-step">
+      <div class="step-num">4</div>
+      <h5>Post-trim QC</h5>
+      <p>FastQC on cleaned reads</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step">
+      <div class="step-num">5</div>
+      <h5>Align</h5>
+      <p>minimap2 to reference</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step">
+      <div class="step-num">6</div>
+      <h5>BAM Sort &amp; Index</h5>
+      <p>samtools sort + index</p>
+    </div>
+    <div class="wf-arrow">&rarr;</div>
+    <div class="wf-step">
+      <div class="step-num">7</div>
+      <h5>Indel Analysis</h5>
+      <p>Visual inspection in IGV</p>
+    </div>
+  </div>
+</section>
+
+<!-- Step-by-step commands -->
+<section>
+  <h2>Step-by-Step Commands</h2>
+
+  <p>All commands assume the following directory structure and variables:</p>
+  <pre><code># --- Set paths ---
+OUTDIR="/Volumes/KINGSTON/ONTsequencing/ONT_testing"
+FASTQ_BASE="/Volumes/KINGSTON/ONTsequencing/NSP_500bp_trial/NSP_Pnapi_500bp/20260305_1613_MD-103872_FBF81064_b0e09933/fastq_pass"
+REF="$OUTDIR/NSP_genomic_ref.fasta"
+REF_MMI="$OUTDIR/NSP_genomic_ref.mmi"</code></pre>
+
+  <!-- Step 1 -->
+  <div class="step-detail">
+    <h3><span class="step-badge">1</span> MinION Sequencing</h3>
+    <p>
+      Data was generated on an Oxford Nanopore MinION with an R10.4.1 flow cell.
+      Basecalling used the HAC model (<code>dna_r10.4.1_e8.2_400bps_hac@v5.2.0</code>)
+      with built-in demultiplexing into 24 barcode directories.
+    </p>
+    <p>Raw reads are located at:</p>
+    <pre><code>$FASTQ_BASE/barcode01/*.fastq.gz
+$FASTQ_BASE/barcode02/*.fastq.gz
+...
+$FASTQ_BASE/barcode24/*.fastq.gz</code></pre>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-detail">
+    <h3><span class="step-badge">2</span> Raw Read QC (FastQC)</h3>
+    <p>
+      Run FastQC on the raw reads to assess base quality, read length distributions,
+      and adapter content <em>before</em> any trimming.
+    </p>
+    <pre><code># Run FastQC on raw reads for a single barcode
+fastqc "$FASTQ_BASE/barcode01"/*.fastq.gz -o "$OUTDIR/fastqc_raw" --threads 2
+
+# Loop over all barcodes
+mkdir -p "$OUTDIR/fastqc_raw"
+for i in $(seq -w 1 24); do
+  fastqc "$FASTQ_BASE/barcode${i}"/*.fastq.gz -o "$OUTDIR/fastqc_raw" --threads 2
+done</code></pre>
+    <p>
+      Check the HTML reports for per-base quality scores, read length distributions,
+      and any adapter contamination flags.
+    </p>
+  </div>
+
+  <!-- Step 3 — NEW -->
+  <div class="step-detail new-detail">
+    <h3><span class="step-badge">3</span> Read Trimming &amp; Cleaning (fastp) <span class="new-label">New</span></h3>
+    <p>
+      Use <a href="https://github.com/OpenGene/fastp">fastp</a> to trim adapters,
+      remove low-quality bases, and filter out short reads. fastp auto-detects adapters
+      and provides its own HTML/JSON quality reports.
+    </p>
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Install</h4>
+    <pre><code># Install via Homebrew (macOS)
+brew install fastp
+
+# Or via conda
+conda install -c bioconda fastp</code></pre>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Single barcode</h4>
+    <pre><code># Concatenate multiple fastq files per barcode if needed, then run fastp
+mkdir -p "$OUTDIR/trimmed"
+
+# For a single barcode with one or more input files:
+cat "$FASTQ_BASE/barcode01"/*.fastq.gz > "$OUTDIR/trimmed/barcode01_raw_merged.fastq.gz"
+
+fastp \
+  --in1 "$OUTDIR/trimmed/barcode01_raw_merged.fastq.gz" \
+  --out1 "$OUTDIR/trimmed/barcode01_trimmed.fastq.gz" \
+  --html "$OUTDIR/trimmed/barcode01_fastp.html" \
+  --json "$OUTDIR/trimmed/barcode01_fastp.json" \
+  --qualified_quality_phred 10 \
+  --length_required 200 \
+  --thread 4</code></pre>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">All barcodes (loop)</h4>
+    <pre><code>mkdir -p "$OUTDIR/trimmed"
+
+for i in $(seq -w 1 24); do
+  BC="barcode${i}"
+
+  # Merge raw fastqs per barcode
+  cat "$FASTQ_BASE/$BC"/*.fastq.gz > "$OUTDIR/trimmed/${BC}_raw_merged.fastq.gz"
+
+  # Run fastp
+  fastp \
+    --in1 "$OUTDIR/trimmed/${BC}_raw_merged.fastq.gz" \
+    --out1 "$OUTDIR/trimmed/${BC}_trimmed.fastq.gz" \
+    --html "$OUTDIR/trimmed/${BC}_fastp.html" \
+    --json "$OUTDIR/trimmed/${BC}_fastp.json" \
+    --qualified_quality_phred 10 \
+    --length_required 200 \
+    --thread 4
+
+  # Clean up merged raw file to save space
+  rm "$OUTDIR/trimmed/${BC}_raw_merged.fastq.gz"
+done</code></pre>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Key fastp parameters</h4>
+    <table>
+      <tr><th>Flag</th><th>Value</th><th>Purpose</th></tr>
+      <tr><td><code>--qualified_quality_phred</code></td><td>10</td><td>Min base quality to keep (Q10; suitable for ONT data)</td></tr>
+      <tr><td><code>--length_required</code></td><td>200</td><td>Discard reads shorter than 200 bp (amplicon is ~500 bp)</td></tr>
+      <tr><td><code>--thread</code></td><td>4</td><td>Parallel processing threads</td></tr>
+      <tr><td><code>--html / --json</code></td><td>—</td><td>Per-barcode QC reports from fastp</td></tr>
+    </table>
+    <p style="margin-top:10px; font-size:0.9em; color:var(--muted);">
+      Adapter detection is automatic. For ONT data, consider also using <code>--cut_front</code> and
+      <code>--cut_tail</code> to trim low-quality stretches at read ends, or adjust <code>--qualified_quality_phred</code>
+      depending on your basecaller accuracy.
+    </p>
+  </div>
+
+  <!-- Step 4 — NEW -->
+  <div class="step-detail new-detail">
+    <h3><span class="step-badge">4</span> Post-Trim QC (FastQC) <span class="new-label">New</span></h3>
+    <p>
+      Run FastQC again on the trimmed reads to confirm that quality has improved and
+      problematic reads were removed. Compare these reports to the raw QC from Step 2.
+    </p>
+    <pre><code>mkdir -p "$OUTDIR/fastqc_trimmed"
+
+for i in $(seq -w 1 24); do
+  fastqc "$OUTDIR/trimmed/barcode${i}_trimmed.fastq.gz" \
+    -o "$OUTDIR/fastqc_trimmed" --threads 2
+done</code></pre>
+    <p>Things to check:</p>
+    <ul>
+      <li>Per-base quality scores should be more uniform after trimming</li>
+      <li>Read length distribution should center around ~500 bp with short reads removed</li>
+      <li>Adapter content warnings should be resolved</li>
+      <li>Compare total read counts before/after to assess filtering loss</li>
+    </ul>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step-detail">
+    <h3><span class="step-badge">5</span> Alignment (minimap2)</h3>
+    <p>
+      Align the <strong>trimmed</strong> reads to the 699 bp genomic reference using minimap2
+      with the ONT preset. The <code>--MD</code> flag adds MD tags for accurate variant display in IGV.
+    </p>
+    <pre><code># Build minimap2 index (if not already done)
+minimap2 -d "$REF_MMI" "$REF"
+
+# Align a single barcode
+minimap2 -a -x map-ont --MD "$REF_MMI" \
+  "$OUTDIR/trimmed/barcode01_trimmed.fastq.gz" \
+  > "$OUTDIR/barcode01_aligned.sam"</code></pre>
+    <p style="font-size:0.9em; color:var(--muted);">
+      We write SAM first here to keep alignment and BAM processing as separate steps,
+      but they can be piped together (see Step 6).
+    </p>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step-detail">
+    <h3><span class="step-badge">6</span> BAM Sorting &amp; Indexing (samtools)</h3>
+    <p>
+      Convert SAM to sorted BAM and create an index for fast random access in IGV.
+    </p>
+    <pre><code># Sort and convert to BAM
+samtools sort -o "$OUTDIR/barcode01_aligned.bam" "$OUTDIR/barcode01_aligned.sam"
+
+# Index the BAM
+samtools index "$OUTDIR/barcode01_aligned.bam"
+
+# Clean up SAM
+rm "$OUTDIR/barcode01_aligned.sam"</code></pre>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Combined pipeline (all barcodes)</h4>
+    <p>For efficiency, pipe alignment directly into sorting:</p>
+    <pre><code>for i in $(seq -w 1 24); do
+  BC="barcode${i}"
+
+  minimap2 -a -x map-ont --MD "$REF_MMI" \
+    "$OUTDIR/trimmed/${BC}_trimmed.fastq.gz" 2>/dev/null | \
+    samtools sort -o "$OUTDIR/${BC}_aligned.bam" -
+
+  samtools index "$OUTDIR/${BC}_aligned.bam"
+done</code></pre>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Quick alignment stats</h4>
+    <pre><code># Check mapping rate and read counts per barcode
+for i in $(seq -w 1 24); do
+  echo -n "barcode${i}: "
+  samtools flagstat "$OUTDIR/barcode${i}_aligned.bam" 2>/dev/null | head -1
+done</code></pre>
+  </div>
+
+  <!-- Step 7 -->
+  <div class="step-detail">
+    <h3><span class="step-badge">7</span> Indel Analysis (IGV)</h3>
+    <p>
+      Open the aligned BAMs in <a href="https://igv.org/">IGV</a> to visually inspect
+      CRISPR-induced indels at the sgRNA cut site.
+    </p>
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">Loading files in IGV</h4>
+    <ol style="margin: 8px 0 8px 20px; font-size:0.95em;">
+      <li><strong>Genomes &gt; Load Genome from File</strong> &rarr; select <code>NSP_genomic_ref.fasta</code></li>
+      <li><strong>File &gt; Load from File</strong> &rarr; select one or more <code>barcodeXX_aligned.bam</code> files</li>
+      <li>Navigate to position <strong>~230</strong> in the reference &mdash; this is the sgRNA cut site</li>
+    </ol>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">IGV settings for indel visualization</h4>
+    <ul>
+      <li><strong>Color alignments by:</strong> &rarr; <em>insert size and pair orientation</em> or <em>read strand</em></li>
+      <li><strong>Sort alignments by:</strong> &rarr; <em>base</em> (at the cut site position) to group indel alleles</li>
+      <li><strong>Show soft-clipped bases</strong> to see if reads extend beyond expected amplicon boundaries</li>
+      <li>Right-click track &rarr; <strong>Collapsed</strong> or <strong>Squished</strong> view for high-coverage samples</li>
+      <li>Look for consistent insertion/deletion patterns clustered at position ~230</li>
+    </ul>
+
+    <h4 style="margin-top:14px; font-size:0.95em; color:var(--primary);">What to look for</h4>
+    <ul>
+      <li>Deletions appear as horizontal black lines spanning the cut site</li>
+      <li>Insertions appear as purple marks (I) at the cut position</li>
+      <li>Wild-type reads align cleanly through the cut site with no gaps</li>
+      <li>Editing efficiency = proportion of reads with indels vs. wild-type at the sgRNA target</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Reference region (carried over) -->
+<section>
+  <h2>Reference Region</h2>
+  <p>
+    The reference is a 699 bp region from <em>P. brassicae</em> chromosome 5
+    (<code>NC_059669.1:14882048-14885601</code>) containing the first coding exon of the NSP gene.
+  </p>
+
+  <div class="ref-diagram"><span class="genomic">5'─────────────────────────────────────────────────────────────────────────3'</span>
+<span class="genomic">   │                  │                                              │    │</span>
+<span class="primer">   │  Fwd primer ──►  │</span>                                              <span class="primer">│  ◄── Rev primer</span>
+<span class="genomic">   │                  │</span>  <span class="exon">╔══════════ Exon 1 (276 bp) ══════════╗</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>  <span class="exon">║  ATG...                         ...║</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>  <span class="exon">╚═════════════════════════════════════╝</span>  <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>      <span class="sgrna">▼▼▼ sgRNA_2 cut site ▼▼▼</span>             <span class="genomic">│    │</span>
+<span class="genomic">   │                  │</span>      <span class="sgrna">CTTCTTAGCCCTCGCGGCTTTGG</span>             <span class="genomic">│    │</span>
+<span class="genomic">   0                ~60               ~230                        ~600  699</span></div>
+</section>
+
+<!-- Software -->
+<section>
+  <h2>Software</h2>
+  <table>
+    <tr><th>Tool</th><th>Version</th><th>Purpose</th></tr>
+    <tr><td>minimap2</td><td>2.30</td><td>ONT read alignment (<code>-x map-ont</code>)</td></tr>
+    <tr><td>samtools</td><td>1.23</td><td>BAM sorting, indexing, stats</td></tr>
+    <tr><td>FastQC</td><td>0.12.1</td><td>Read quality assessment (pre- and post-trim)</td></tr>
+    <tr><td>fastp</td><td>0.24+</td><td>Read trimming, adapter removal, quality filtering</td></tr>
+    <tr><td>IGV</td><td>—</td><td>Visual inspection of alignments and indels</td></tr>
+  </table>
+</section>
+
+</div>
+
+<footer>
+  ONT CRISPR Amplicon Sequencing — Revised Workflow | bioinfowheat
+</footer>
+
+</body>
+</html>
