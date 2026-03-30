@@ -51,4 +51,25 @@ for user in elegom grenik matmiq nogmoh elenik ;do
     sudo ./bash_paths.sh $user
 done
 
+# need to add new script
+cd /mnt/griffin/chrwhe/ONT_testing
+# /mnt/griffin/chrwhe/software/fastp
 
+nano bash_paths_add_1.sh
+#!/bin/bash
+for user in $1 ;do
+    echo '# additional paths for MsC course:' >> /home/$user/.bashrc
+    echo 'export PATH=$PATH:/mnt/griffin/chrwhe/software/fastp' >> /home/$user/.bashrc
+done
+
+#
+chmod u+x bash_paths_add_1.sh
+
+
+for user in elegom grenik matmiq nogmoh elenik ;do
+    sudo ./bash_paths_add_1.sh $user
+done
+
+# could export mamaba root to their own directory
+echo "export MAMBA_ROOT_PREFIX=/mnt/griffin/$user//mamba_installs" >> ~/.bashrc
+source ~/.bashrc
