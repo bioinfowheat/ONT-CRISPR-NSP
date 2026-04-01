@@ -7,6 +7,8 @@ parallel 'unpigz {}' ::: *.gz
 micromamba create -n crispresso2_env -c conda-forge -c bioconda crispresso2
 # activate installation
 micromamba activate crispresso2_env
+# note, when you are done you can type
+micromamba deactivate
 
 # file names
 barcode01.combined.fastq
